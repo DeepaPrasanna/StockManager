@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block main %}
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+              <th scope="col">Symbol</th>
+              <th scope="col">Name</th>
+              <th scope="col">Shares</th>
+              <th scope="col">Price</th>
+              <th scope="col">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {%for row in stocks%}
+              <tr>
+                <td>{{row["shares_name"]}}</th>
+                <td>{{api_results[loop.index - 1]["name"]}}</td>
+                <td>{{row["shares_no"]}}</td>
+                <td>${{ '%0.2f' % api_results[loop.index - 1]["price"]}}</td>
+                <td>${{'%0.2f' % (api_results[loop.index - 1]["price"] * row["shares_no"])}}</td>
+              </tr>
+            {%endfor%}
+            <tr>
+                <td>CASH</td>
+                <td colspan="3"></td>
+                <td>${{'%0.2f' %current_cash}}</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4"></td>
+                <td>${{'%0.2f'% (sum_shares + current_cash)}}</td>
+            </tr>
+        </tfoot>
+    </table>
+
+{% endblock %}

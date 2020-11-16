@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    history
+{% endblock %}
+
+{% block main %}
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+              <th scope="col">Symbol</th>
+              <th scope="col">Shares</th>
+              <th scope="col">Price</th>
+              <th scope="col">Transacted(in UTC)</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {%for row in stocks%}
+            {%if row.status == "buy" %}
+                {{buy}}
+                {%set sign = '+' %}
+            {%else %}
+                {{sell}}
+                {%set sign = '-' %}
+            {% endif %}
+              <tr>
+                <td>{{row.shares_name}}</th>
+                <td>{{sign}}{{row.shares_no}}</td>
+                <td>${{row.price}}</td>
+                <td>{{row.timestamp}}</td>
+              </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+
+{% endblock %}
