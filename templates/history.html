@@ -17,7 +17,7 @@
         </thead>
         <tbody>
 
-            {%for row in stocks%}
+            {%for row in history%}
             {%if row.status == "buy" %}
                 {{buy}}
                 {%set sign = '+' %}

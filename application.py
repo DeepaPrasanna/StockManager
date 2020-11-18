@@ -63,7 +63,7 @@ def index():
 
     # retrieve all the stocks the current user has
     stocks = Share.query.filter_by(user_id=session["user_id"]).all()
-    # shares_no = 0
+
     shares=[]
     for row in stocks:
         shares.append({"shares_name":row.shares_name,"shares_no":float(row.shares_no)})
@@ -71,22 +71,17 @@ def index():
   
     # retrieve the details of the current_user
     user_details = db2.execute("SELECT * FROM users WHERE id=(%s);",(session["user_id"]))
-   
+    
+
+    # to store the cash the user currently has
     for user in user_details:
-        # user_name = user["username"]
-        # hash = user["hash"]
-        cash = user["cash"]
+        current_cash = float(user["cash"])
         
     # to store the current details of the stock symbol by calling the IEX cloud API
     api_results =[]
     for symbol in stocks:
-        # return str(symbol)
         result = lookup(symbol.shares_name)
-        # return str(symbol.shares_name)
         api_results.append(result)
-
-    # to store the cash the user has currently
-    current_cash = float(cash)
 
     # to store the sum of the price of the shares the current user has
     sum_of_shares_row = db2.execute("SELECT SUM(total_price) FROM shares WHERE user_id=(%s);",(session["user_id"]))
@@ -98,7 +93,6 @@ def index():
     else:
         sum_shares = float(sum_of_shares[0])
 
-    # return str(api_results)
     return render_template("index.html",stocks=shares, current_cash=current_cash, api_results=api_results,sum_shares=sum_shares)
 
 
@@ -114,7 +108,7 @@ def buy():
         if not request.form.get("symbol"):
             return apology("must provide symbol", 403)
 
-        # Ensure no. of shares was is a positive integer
+        # Ensure no. of shares is a positive integer
         elif int(request.form.get("shares")) <= 0:
             return apology("must provide shares", 403)
 
@@ -128,8 +122,6 @@ def buy():
             current_price = results["price"]
 
             # to check how much cash the current user has
-            # query the database based on the userid
-            # rows = User.query.filter_by(id=session["user_id"]).all()
             user_details = db2.execute("SELECT * FROM users WHERE id=(%s);",(session["user_id"]))
             
             for user in user_details:
@@ -142,16 +134,11 @@ def buy():
 
             else:
                 cash = float(cash) - total_price
+
                 # update the remaining cash
                 db2.execute("UPDATE users SET cash =(%s) WHERE id=(%s);",(cash,session["user_id"]))
-            #    db2.execute("UPDATE  FROM shares WHERE user_id=(%s);",(session["user_id"]))
                
-                # for row in rows:
-                #     row.cash = cash
-                #     db.session.merge(row)
-
                 # insert the shares pertaining to the current user
-                # db.execute("INSERT INTO shares (user_id, shares_name, shares_no,total_price) VALUES(?, ?, ?,?)", session["user_id"],request.form.get("symbol"),int(request.form.get("shares")),total_price)
                 share=Share(
                     user_id=session["user_id"],
                     shares_name=request.form.get("symbol"),
@@ -162,7 +149,6 @@ def buy():
                 db.session.commit()
 
                 # insert the shares pertaining to the current user in the history table
-                # db.execute("INSERT INTO history (user_id, shares_name, shares_no,price,status) VALUES(?, ?, ?,?,?)", session["user_id"],request.form.get("symbol"),int(request.form.get("shares")),results["price"],"buy")
                 history=History(
                     user_id=session["user_id"],
                     shares_name=request.form.get("symbol"),
@@ -188,11 +174,9 @@ def history():
     """Show history of transactions"""
 
     # retrieve all the transactions the current user has in the history table
-    # stocks = db.execute("SELECT * FROM history WHERE user_id=:current_user",current_user=session["user_id"])
-    stocks = History.query.filter_by(user_id=session["user_id"]).all()
-    # return str(rows)
+    history = History.query.filter_by(user_id=session["user_id"]).all()
 
-    return render_template("history.html",stocks=stocks)
+    return render_template("history.html",history=history)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -275,8 +259,6 @@ def register():
             return apology("must provide username", 403)
 
         # Ensure the username is unique
-
-        # query the database based on the username
         rows = User.query.filter_by(username=request.form.get("username")).first() 
       
         if rows != None:
@@ -315,6 +297,7 @@ def register():
         )
         db.session.add(user)
         db.session.commit()
+
         # Redirect user to home page
         return redirect("/")
 
@@ -361,7 +344,6 @@ def sell():
 
         # look up for the details of the stock symbol the users selects
         results = lookup(request.form.get("symbol"))
-        # return str(results)
 
         # price of the share the user sells
         total_price = results["price"] * int(request.form.get("shares"))
@@ -369,19 +351,12 @@ def sell():
         db2.execute("UPDATE shares SET total_price=(%s) WHERE user_id=(%s) and shares_name=(%s);",(total_price,session["user_id"],request.form.get("symbol")))
 
         # retrieve details of the current user
-        
-        # user_details = User.query.filter_by(id=session["user_id"]).all() 
-
         user_details = db2.execute("SELECT * FROM users WHERE id=(%s);",(session["user_id"]))
             
+        # how much cash the user has prior selling
         for user in user_details:
             current_cash = float(user["cash"])
 
-        # how much cash the user has prior selling
-        # for row in user_details:
-        #     current_cash = user_details.cash
-
-        # update the cash after selling
         update_current_cash = float(current_cash) + total_price
 
         db2.execute("UPDATE users SET cash=(%s) WHERE id=(%s);",(update_current_cash,session["user_id"]))
@@ -396,6 +371,7 @@ def sell():
                 )
         db.session.add(history)
         db.session.commit()
+        
         # Redirect user to home page
         return redirect("/")
 
