@@ -22,7 +22,7 @@ load_dotenv()
 app = Flask(__name__)
 
 #SqlAlchemy Database Configuration With PostgreSQL
-DATABASE_URL = os.getenv("DB_URI")
+DATABASE_URL = os.getenv("DATABASE_URL")
 app.config['SQLALCHEMY_DATABASE_URI'] =  DATABASE_URL
 
 # create an object of SQLAlchemy named as db, which will handle our ORM-related activities.
