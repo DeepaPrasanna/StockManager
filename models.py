@@ -1,5 +1,8 @@
 from application import db
+# from flask_sqlalchemy import SQLAlchemy
+
 from datetime import datetime
+# db = SQLAlchemy(app)
 
 
 # declare a class as Users which will hold the schema for the users table:

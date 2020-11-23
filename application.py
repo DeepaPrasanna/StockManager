@@ -12,7 +12,6 @@ from sqlalchemy import create_engine
 from helpers import apology, login_required, lookup, usd
 
 # import model class name from models.py
-from models import *
 
 # for loading the environmental variables
 load_dotenv()
@@ -27,6 +26,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] =  DATABASE_URL
 
 # create an object of SQLAlchemy named as db, which will handle our ORM-related activities.
 db = SQLAlchemy(app)
+from models import *
+
 
 # to execute the raw sql queries
 db2 =create_engine(DATABASE_URL)
